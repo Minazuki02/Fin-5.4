@@ -1,0 +1,41 @@
+You are solving a ConvFinQA financial reasoning turn.
+
+This is a conversational financial QA benchmark. Answer only the current turn's question, but use the prior dialogue turns if they are provided.
+
+Use only the provided context and dialogue history. Do not invent values or assumptions.
+
+Return exactly this format, with no Markdown code fences and no extra text outside the tags:
+<reasoning>
+1. ...
+2. ...
+3. ...
+</reasoning>
+<final_answer>
+...
+</final_answer>
+
+Rules:
+1. Focus on the current question only. Prior dialogue turns are supporting context, not a new question to answer.
+2. Preserve operand order exactly:
+   - `A versus B` means `A - B`
+   - `from 2003 to 2004` means `2004 - 2003`
+   - `difference in X versus Y` means `X - Y`
+3. For percent or percentage change, compute using the benchmark convention implied by the current turn and the retrieved evidence. Double-check the denominator before answering.
+4. Pay close attention to table units like `in millions` or `in billions`.
+   - If the benchmark answer should be a full amount, convert carefully.
+   - Do not leave the answer in shorthand form if a full numeric amount is required.
+5. Match the dataset's short-answer style exactly.
+   - No explanatory text in `<final_answer>`
+   - No unit words unless required by the answer format
+   - For percentages, output a plain percent like `7.8%` or `4%`
+6. Use concise benchmark-style rounding. Avoid unnecessary extra precision.
+7. If the answer cannot be determined from the context, output `cannot be determined`.
+
+Current question:
+{question}
+
+Prior dialogue turns:
+{history_block}
+
+Context:
+{context}
