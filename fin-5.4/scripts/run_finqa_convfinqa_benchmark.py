@@ -363,6 +363,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default="benchmark_results",
         help="Directory for benchmark outputs.",
     )
+    parser.add_argument(
+        "--trust-remote-code",
+        action="store_true",
+        default=False,
+        help="Allow downloading and running custom model code from the Hub. "
+        "Only enable this for models you trust. Standard Qwen2.5 models do not need this.",
+    )
     return parser
 
 
@@ -386,7 +393,9 @@ def main() -> None:
     finqa_prompt = load_prompt(Path(args.finqa_prompt))
     convfinqa_prompt = load_prompt(Path(args.convfinqa_prompt))
 
-    tokenizer = AutoTokenizer.from_pretrained(args.base_model, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        args.base_model, trust_remote_code=args.trust_remote_code
+    )
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "left"
@@ -395,7 +404,7 @@ def main() -> None:
         args.base_model,
         torch_dtype=torch.bfloat16,
         device_map="auto",
-        trust_remote_code=True,
+        trust_remote_code=args.trust_remote_code,
         attn_implementation="flash_attention_2",
     )
     model = PeftModel.from_pretrained(base_model, str(adapter_dir))
