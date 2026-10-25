@@ -135,6 +135,13 @@ def main():
     parser.add_argument('--dataset_path')
     parser.add_argument('--model_path')
     parser.add_argument('--interval', type=float, default=10.0)
+    parser.add_argument(
+        '--trust-remote-code',
+        action='store_true',
+        default=False,
+        help='Allow downloading and running custom model code from the Hub. '
+        'Only enable this for models you trust. Standard Qwen2.5 models do not need this.',
+    )
     args = parser.parse_args()
 
     run_dir = Path(args.run_dir)
@@ -144,7 +151,9 @@ def main():
     log_path = run_dir / 'logging.jsonl'
     enriched_path = run_dir / 'logging_enriched.jsonl'
 
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_path, trust_remote_code=args.trust_remote_code
+    )
     records = load_dataset_records(dataset_path, tokenizer, int(run_args['max_length']))
     step_stats = build_step_stats(
         records,
